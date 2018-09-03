@@ -58,17 +58,20 @@ public class FileDownloader {
 
             // Output stream
             output = new FileOutputStream(dest);
+            //sendNotification((int) ((float) downloadSize / (float) lengthOfFile * 100));
+//                    Service.setWebViewLending(Lending.getLending(modName,"loadingPercent", step), webView, mActivity); int tmp = 0;
             int tmp = 0;
             while ((count = input.read(buffer)) != -1) {
                 downloadSize += count;
-                if (tmp%50 == 0) {
+                if (tmp%400 == 0) {
                     //sendNotification((int) ((float) downloadSize / (float) lengthOfFile * 100));
-                    Service.setWebViewLending(Service.getLoadPercentLending(modName, (int) ((float) downloadSize / (float) lengthOfFile * 100)), webView, mActivity);
+                    Service.setWebViewLending(Lending.getLending(modName,"loadingPercent",  (int) ((float) downloadSize / (float) lengthOfFile * 100)), webView, mActivity);
                 }
                 tmp++;
                 output.write(buffer, 0, count);
                 output.flush();
             }
+
             // flushing output
             output.flush();
 
