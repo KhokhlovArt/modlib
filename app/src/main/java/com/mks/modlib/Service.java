@@ -15,7 +15,6 @@ public class Service {
         a.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
                     String base64 = Base64.encodeToString(lending.getBytes(), Base64.DEFAULT);
                     webView.loadData(base64, "text/html; charset=utf-8", "base64");

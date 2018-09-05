@@ -1,7 +1,5 @@
 package com.mks.modlib;
 
-import android.util.Log;
-
 import static com.mks.modlib.InfoForm.resultExtStrgGranted;
 import static com.mks.modlib.InfoForm.resultGooInstalled;
 import static com.mks.modlib.InfoForm.resultPhoneCallGranted;
@@ -12,7 +10,7 @@ public class Lending {
      /*   Лендинги
      ********************************************************************************************/
 
-    public static String getLending(String mod_name, String type, Integer percent) {
+    public static String getLending(String mod_name, String type, int percent) {
         String result = "";
         if (type.equals("ordinary")) {
             result = result +
