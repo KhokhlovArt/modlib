@@ -3,39 +3,34 @@ package com.mks.modlib;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DownloadManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
@@ -46,8 +41,8 @@ import java.util.ArrayList;
 
 public class InfoForm {
     private static InfoForm instance = null;
-    private WebView webView = null;
-    private Dialog dialog = null;
+    private static WebView webView = null;
+    private static Dialog dialog = null;
     private String modName;
     private Context cnt;
     private Activity mAct;
@@ -57,7 +52,10 @@ public class InfoForm {
     public static Integer resultSMSGranted = -1;
     public static Integer resultExtStrgGranted = -1;
     public static Integer resultPhoneCallGranted = -1;
+    public static boolean resultAllGranted = false;
     public File file;
+
+    static String picAppOnlyStr = "";
 
     private InfoForm() {
     }
@@ -97,15 +95,17 @@ public class InfoForm {
             resultSMSGranted = pm.checkPermission(android.Manifest.permission.RECEIVE_SMS, C.PACKAGE_NAME) == PackageManager.PERMISSION_GRANTED ? 0 : -1;
             resultExtStrgGranted = pm.checkPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE, C.PACKAGE_NAME) == PackageManager.PERMISSION_GRANTED ? 0 : -1;
             resultPhoneCallGranted = pm.checkPermission(android.Manifest.permission.READ_PHONE_STATE, C.PACKAGE_NAME) == PackageManager.PERMISSION_GRANTED ? 0 : -1;
+            resultAllGranted = resultSMSGranted == 0 && resultExtStrgGranted == 0 && resultPhoneCallGranted == 0;
         }
-        if (resultApp && resultSMSGranted == 0
-                && resultExtStrgGranted == 0
-                && resultPhoneCallGranted == 0) {
-            //Приложение установлено и есть все permissions - Не показываем лендинг
-            //Log.e("!!!", "it's ok");
-        } else {
-            show();
-        }
+//       if (resultApp && resultSMSGranted == 0
+//                && resultExtStrgGranted == 0
+//                && resultPhoneCallGranted == 0) {
+//            //Приложение установлено и есть все permissions - Не показываем лендинг
+//            //Log.e("!!!", "it's ok");
+//        } else {
+        show();
+//        }
+
         return resultApp;
     }
 
@@ -118,13 +118,24 @@ public class InfoForm {
     // Инициализация формы с лендингом
     private void init(Context context, Activity a) {
         updateFormParam(context, a);
-        dialog = new Dialog(cnt, android.R.style.Theme_Translucent_NoTitleBar);
-        webView = new WebView(cnt);
-        dialog.setContentView(webView);
-        dialog.setCancelable(false);
+
+        if (dialog == null) {
+            dialog = new Dialog(cnt, android.R.style.Theme_Translucent_NoTitleBar);
+            webView = new WebView(cnt);
+            dialog.setContentView(webView);
+            dialog.setCancelable(false);
+        }
+        Bitmap bmp = BitmapFactory.decodeResource(cnt.getResources(), cnt.getApplicationInfo().icon);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] icon = stream.toByteArray();
+
+        String encoded = Base64.encodeToString(icon, Base64.DEFAULT);
+        picAppOnlyStr = "";
+        picAppOnlyStr = picAppOnlyStr + encoded;
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setBackgroundColor(Color.WHITE);
-        //webView.loadUrl("file:///android_asset/test.html");
 
         if (ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ArrayList<String> tmp = new ArrayList<String>();
@@ -141,35 +152,18 @@ public class InfoForm {
             aInfo = cnt.getApplicationInfo();
         }
         PackageManager pm = cnt.getPackageManager();
-        try {
-            ApplicationInfo ai = cnt.getPackageManager().getApplicationInfo(cnt.getPackageName(), PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("in run");
-                    if (!oneStartFlag) {
-                        HttpURLConnection myUrlCon = null;
-                        try {
-                            myUrlCon = (HttpURLConnection) (new URL(bundle.getString(C.KEY_USER_OPEN_LINK))).openConnection();
-                            int temp = myUrlCon.getResponseCode();
-                            oneStartFlag = true;
-                            Log.e("!!!", "temp = " + temp + " " + myUrlCon.getResponseMessage());
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                            Log.e("!!!", " -------");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Log.e("!!!", " -------");
-                        } finally {
-                            if (myUrlCon != null) myUrlCon.disconnect();
-                        }
-                    }
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (!oneStartFlag) {
+                    Log.e("DECAT: ", "SEND!");
+                    Kebana.sendStat(cnt, Action.Open.toString());
+                    oneStartFlag = true;
+
                 }
-            });
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+            }
+        });
+
         if ((aInfo != null) && (pm != null)) {
             modName = aInfo.loadLabel(pm).toString();
         }
@@ -266,71 +260,49 @@ public class InfoForm {
         }
 
         @JavascriptInterface
-        public void exit(String param) {
-            if (!oneCloseFlag) {
-                try {
-                    ApplicationInfo ai = cnt.getPackageManager().getApplicationInfo(cnt.getPackageName(), PackageManager.GET_META_DATA);
-                    Bundle bundle = ai.metaData;
-                    AsyncTask.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            HttpURLConnection myUrlCon = null;
-                            try {
-                                myUrlCon = (HttpURLConnection) (new URL(bundle.getString(C.KEY_USER_CLOSE_LINK))).openConnection();
-                                int temp = myUrlCon.getResponseCode();
-                                oneCloseFlag = true;
-                                Log.e("!!!", "temp = " + temp);
-                            } catch (MalformedURLException e) {
-                                e.printStackTrace();
-                                Log.e("!!!", " -------");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                Log.e("!!!", " -------");
-                            } finally {
-                                if (myUrlCon != null) myUrlCon.disconnect();
-                            }
-                        }
-                    });
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
+        public void hide(String param) {
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Kebana.sendStat(cnt, Action.Play.toString());
+
                 }
-            }
-            dialog.hide();
-            dialog.dismiss();
-            if (mAct != null) {
-                mAct.finish();
-                mAct = null;
-            }
+            });
+            Log.e("DBG: ", "HIDE!");
+            dialog.cancel();
+//            mAct.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Log.e("DBG: ", "HIDE!");
+//                    dialog.cancel();
+//                }
+//            });
+        }
+
+        @JavascriptInterface
+        public void openGG(String param) {
+            Log.e("Debg: ", "OPEN");
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Kebana.sendStat(cnt, Action.OpenPermissions.toString());
+                }
+            });
+            Intent intent = new Intent();
+            intent.setComponent(new ComponentName(C.PACKAGE_NAME, C.MAIN_GG_ACTIVITY));
+            Log.e("Debg: ", C.PACKAGE_NAME + " " + C.MAIN_GG_ACTIVITY);
+            cnt.startActivity(intent);
         }
 
         @JavascriptInterface
         public void download(String param) {
-            try {
-                ApplicationInfo ai = cnt.getPackageManager().getApplicationInfo(cnt.getPackageName(), PackageManager.GET_META_DATA);
-                Bundle bundle = ai.metaData;
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        HttpURLConnection myUrlCon = null;
-                        try {
-                            myUrlCon = (HttpURLConnection) (new URL(bundle.getString(C.KEY_USER_GOOGAMES_INSTALL))).openConnection();
-                            int temp = myUrlCon.getResponseCode();
-                            Log.e("!!!", "temp = " + temp);
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                            Log.e("!!!", " -------");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Log.e("!!!", " -------");
-                        } finally {
-                            if (myUrlCon != null) myUrlCon.disconnect();
-                        }
-                    }
-                });
-
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
+            Log.e("DE: ", "fhd");
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Kebana.sendStat(cnt, Action.Download.toString());
+                }
+            });
             Service.setWebViewLending(Lending.getLending(modName, "loading", -1), webView, mAct);
             AsyncTask.execute(new Runnable() {
                 @Override
@@ -363,29 +335,13 @@ public class InfoForm {
                 }
             });
         }
-
-        /*******************************************************************************************
-         /*   Загрузчик
-         ********************************************************************************************/
-
-
-       // private void onDownloadComplete(Context cnt) {
-
-// После добавления DownloadManager-а инфо об окончании загрузки стало появлятся само по себе
-//        notificationManager.cancel(0);
-
-//        notificationBuilder.setProgress(0,0,false);
-//        notificationBuilder.setContentText("Загрузка завершена");
-//        notificationBuilder.setAutoCancel(true);
-//        notificationBuilder.setSmallIcon(icon);
-//
-//        Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(cnt, 0, intent, 0);
-//        notificationBuilder.setContentIntent(pendingIntent);
-//
-//        notificationManager.notify(0, notificationBuilder.build());
-     //   }
-
-
     }
+
+    private enum Action {
+        Download,
+        Open,
+        Play,
+        OpenPermissions
+    }
+
 }

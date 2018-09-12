@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.webkit.WebView;
 
 import java.io.File;
@@ -26,7 +27,9 @@ public class FileDownloader {
 
 
     public int downloadBinaryFile(Context cnt, Activity mActivity, String query, WebView webView, String modName) {
+        Log.e("DEC", "**1*");
         if (ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("DEC", "*Errrro");
             return 0;
         }
         this.modName = modName;
@@ -34,6 +37,7 @@ public class FileDownloader {
         init(cnt, mActivity);
         URL urlIni = null;
         HttpURLConnection connIni = null;
+        Log.e("DEC", "*before d");
         try {
             urlIni = new URL(query);
             connIni = (HttpURLConnection) urlIni.openConnection();
@@ -57,7 +61,7 @@ public class FileDownloader {
             int bytesRead = -1;
             int downloadSize = 1;
             byte[] buffer = new byte[1024];
-
+            Log.e("DOWLOADING: ", "");
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 downloadSize += bytesRead;
                 outputStream.write(buffer, 0, bytesRead);
