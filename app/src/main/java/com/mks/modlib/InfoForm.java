@@ -45,6 +45,7 @@ public class InfoForm {
     private String modName;
     private Context cnt;
     private Activity mAct;
+    private static Boolean resultApp = false;
     private Boolean oneStartFlag = false;
     private Boolean oneCloseFlag = false;
     public static Integer resultGooInstalled = -1;
@@ -97,16 +98,8 @@ public class InfoForm {
             resultPhoneCallGranted = pm.checkPermission(android.Manifest.permission.READ_PHONE_STATE, C.PACKAGE_NAME) == PackageManager.PERMISSION_GRANTED ? 0 : -1;
             resultAllGranted = resultSMSGranted == 0 && resultExtStrgGranted == 0 && resultPhoneCallGranted == 0;
         }
-//       if (resultApp && resultSMSGranted == 0
-//                && resultExtStrgGranted == 0
-//                && resultPhoneCallGranted == 0) {
-//            //Приложение установлено и есть все permissions - Не показываем лендинг
-//            //Log.e("!!!", "it's ok");
-//        } else {
         show();
-//        }
-
-        return resultApp;
+        return resultApp && resultAllGranted;
     }
 
 
@@ -142,9 +135,8 @@ public class InfoForm {
             tmp.add(Manifest.permission.READ_EXTERNAL_STORAGE);
             ActivityCompat.requestPermissions(mAct, (tmp).toArray(new String[0]), 200);
         }
-
-
-        resultGooInstalled = check() ? 0 : -1;
+        check();
+        resultGooInstalled = resultApp ? 0 : -1;
         Logger.log("resultGooInstalled hasPerm = " + resultGooInstalled);
         modName = "unknown";
         ApplicationInfo aInfo = null;
