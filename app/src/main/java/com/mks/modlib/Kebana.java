@@ -145,7 +145,7 @@ public class Kebana {
 //                res = readInputStreamAsString(in);
 //                in.close();
             }
-            Log.e("DECAT: ", res);
+            Logger.log(res);
             return res;
         } catch (Exception e) {
             System.out.println(query + " " + e.getMessage());
