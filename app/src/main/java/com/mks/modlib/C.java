@@ -9,9 +9,6 @@ public class C {
     public static String STATISTIC_URL = "https://modlib.mks.group/logsmod-__DATA__/log/"; // Ссылка по которой будет отправляться статистика
 
 
-   /* public static String KEY_USER_GOOGAMES_INSTALL =  "USER_GOOGAMES_INSTALL"; // Ссылка для подсчета  нажатий кнопки установки GG
-    public static String KEY_USER_CLOSE_LINK =  "USER_CLOSE_LINK"; // Ссылка для подсчета закрытия лендинга по крестику
-    public static String KEY_USER_OPEN_LINK = "USER_OPEN_LINK"; //ссылка для подсчета открытий приложения*/
     public static String LIB_VERSION = "1.0.3";
     public static String KEY_PSSD = "fsdfD32d)";
     public static String KEY_LGN = "modlib";

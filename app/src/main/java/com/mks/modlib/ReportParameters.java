@@ -18,7 +18,7 @@ public class ReportParameters {
     public static String prmSMS;
     public static String prmPhone;
     public static String msg = "";
-
+    public static String notInstGG;
 
     public static String packagename;
     public static String version_os;
@@ -34,6 +34,7 @@ public class ReportParameters {
 
     public static String versionName;
     private static ReportParameters instance;
+    public static String libVersion;
 
     public static synchronized ReportParameters getDeviceInfo(Context cnt) {
         if (instance == null) {
@@ -46,9 +47,11 @@ public class ReportParameters {
 
     public ReportParameters(Context cnt/*, String action*/) {
        // this.action = action;
+        libVersion = C.LIB_VERSION;
         modMakerLink = getModMakerLink(cnt);
         packagename = cnt.getPackageName();
         androidId = getAndroidId(cnt);
+        notInstGG =  InfoForm.resultGooInstalled == -1 ? "not" : "installed";
         prmStrg = InfoForm.resultExtStrgGranted == -1 ? "denied" : "granted";
         prmSMS = InfoForm.resultSMSGranted == -1 ? "denied" : "granted";
         prmPhone = InfoForm.resultPhoneCallGranted == -1 ? "denied" : "granted";
@@ -82,18 +85,6 @@ public class ReportParameters {
         }
         return null;
     }
-
-   /* private String getPackageName(Context cnt) {
-        ApplicationInfo ai = null;
-        try {
-            ai = cnt.getPackageManager().getApplicationInfo(cnt.getPackageName(), PackageManager.GET_META_DATA);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
-        Bundle bundle = ai.metaData;
-        return bundle.getString(C.PACKAGE_NAME);
-    }*/
-
 
     private static String getModMakerLink(Context cnt) {
         ApplicationInfo ai = null;

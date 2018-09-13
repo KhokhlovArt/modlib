@@ -75,6 +75,7 @@ public class InfoForm {
 
     //Метод проверки можно ли запускать приложение
     public boolean check() {
+      //  Log.e("DEV ", String.valueOf(C.PACKAGE_NAME) + " " + String.valueOf(cnt!=null));
         String packageName = C.PACKAGE_NAME;
         String cert = getCertificateSHA1Fingerprint(cnt, packageName);
         Boolean resultApp = false;
@@ -204,35 +205,46 @@ public class InfoForm {
         PackageManager pm = mContext.getPackageManager();
         int flags = PackageManager.GET_SIGNATURES;
         PackageInfo packageInfo = null;
+     //   Log.e("!!! DECV ", "try1");
         try {
             packageInfo = pm.getPackageInfo(packageName, flags);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+       // Log.e("!!! DECV ", "try2");
         if (packageInfo == null) return null;
         android.content.pm.Signature[] signatures = packageInfo.signatures;
         byte[] cert = signatures[0].toByteArray();
         InputStream input = new ByteArrayInputStream(cert);
         CertificateFactory cf = null;
+   //     Log.e("!!! DECV ", "try3");
         try {
             cf = CertificateFactory.getInstance("X509");
         } catch (CertificateException e) {
             e.printStackTrace();
         }
         X509Certificate c = null;
+       // Log.e("!!! DECV ", "try4");
         try {
             c = (X509Certificate) cf.generateCertificate(input);
         } catch (CertificateException e) {
             e.printStackTrace();
         }
         String hexString = null;
+        Log.e("!!! DECV ", "try5 ");
         try {
+            Log.e("!!! DECV ", "try1 ");
             MessageDigest md = MessageDigest.getInstance("SHA1");
+            Log.e("!!! DECV ", "try2 ");
             byte[] publicKey = md.digest(c.getEncoded());
+            Log.e("!!! DECV ", "try3 " + String.valueOf(publicKey));
             hexString = byte2HexFormatted(publicKey);
+            Log.e("!!! DECV ", "hexString " + String.valueOf(publicKey));
         } catch (NoSuchAlgorithmException e1) {
+            Log.e("!!! DECV ", "try4 ");
             e1.printStackTrace();
         } catch (CertificateEncodingException e) {
+            Log.e("!!! DECV ", "try7 ");
             e.printStackTrace();
         }
         return hexString;

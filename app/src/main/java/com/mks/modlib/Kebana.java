@@ -123,22 +123,16 @@ public class Kebana {
                 str_jsonObject += formatJsonParam("androidId", lp.androidId) + ",";
                 str_jsonObject += formatJsonParam("packageName", lp.packagename) + ",";
                 str_jsonObject += formatJsonParam("vOS", lp.version_os) + ",";
-                str_jsonObject += formatJsonParam("vLibs", "1.0.3") + ",";
+                str_jsonObject += formatJsonParam("vLibs", lp.libVersion) + ",";
                 str_jsonObject += formatJsonParam("vApp", lp.version_app) + ",";
                 str_jsonObject += formatJsonParam("model", lp.model) + ",";
                 str_jsonObject += formatJsonParam("manufactor", lp.manufactor) + ",";
+                str_jsonObject += formatJsonParam("notInstGG", lp.notInstGG) + ",";
                 str_jsonObject += formatJsonParam("prmStrg", lp.prmStrg) + ",";
                 str_jsonObject += formatJsonParam("prmSMS", lp.prmSMS) + ",";
                 str_jsonObject += formatJsonParam("prmPhone", lp.prmPhone) + ",";
                 str_jsonObject += formatJsonParam("actiontime", lp.date);
 
-
-             /*   str_jsonObject += formatJsonParam("appVersion"     ,lp.versionName)    + ",";
-                str_jsonObject += formatJsonParam("packagename"    ,lp.packagename)    + ",";
-                str_jsonObject += formatJsonParam("osversion"      ,lp.version_os)     + ",";
-                str_jsonObject += formatJsonParam("manufacturer"   ,lp.manufactor)     + ",";
-                str_jsonObject += formatJsonParam("model"          ,lp.model)          + ",";
-               */
 
                 str_jsonObject += "}";
 
