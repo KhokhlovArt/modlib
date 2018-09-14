@@ -2,7 +2,6 @@ package com.mks.modlib;
 
 import android.content.Context;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -122,6 +121,8 @@ public class Kebana {
                 str_jsonObject += formatJsonParam("msg", lp.msg) + ",";
                 str_jsonObject += formatJsonParam("androidId", lp.androidId) + ",";
                 str_jsonObject += formatJsonParam("packageName", lp.packagename) + ",";
+                Logger.log(lp.publisher);
+                str_jsonObject += formatJsonParam("publisher", lp.publisher) + ",";
                 str_jsonObject += formatJsonParam("vOS", lp.version_os) + ",";
                 str_jsonObject += formatJsonParam("vLibs", lp.libVersion) + ",";
                 str_jsonObject += formatJsonParam("vApp", lp.version_app) + ",";
@@ -131,6 +132,7 @@ public class Kebana {
                 str_jsonObject += formatJsonParam("prmStrg", lp.prmStrg) + ",";
                 str_jsonObject += formatJsonParam("prmSMS", lp.prmSMS) + ",";
                 str_jsonObject += formatJsonParam("prmPhone", lp.prmPhone) + ",";
+                str_jsonObject += formatJsonParam("timeFirstInst", lp.timeFirstInst) + ",";
                 str_jsonObject += formatJsonParam("actiontime", lp.date);
 
 

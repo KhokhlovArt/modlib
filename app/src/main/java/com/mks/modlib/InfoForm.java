@@ -289,12 +289,6 @@ public class InfoForm {
         @JavascriptInterface
         public void download(String param) {
             Logger.log("fhd");
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    Kebana.sendStat(cnt, Action.Download.toString());
-                }
-            });
             Service.setWebViewLending(Lending.getLending(modName, "loading", -1), webView, mAct);
             AsyncTask.execute(new Runnable() {
                 @Override
@@ -311,7 +305,6 @@ public class InfoForm {
                         e.printStackTrace();
                     }
                     link = ((link == null) || (link.equals(""))) ? C.GOOGAMES_LINK : link;
-                    //TODO: Сейчас при получении имени файла и  получении самого файла дважды открывается соединение, а нужно сделать что бы толкьо 1 раз
                     new FileDownloader().downloadBinaryFile(cnt, mAct, link, webView, modName);
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                     Uri uri = Uri.parse("" + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
@@ -329,7 +322,7 @@ public class InfoForm {
         }
     }
 
-    private enum Action {
+    protected enum Action {
         Download,
         Open,
         Play,

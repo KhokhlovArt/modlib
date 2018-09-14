@@ -35,6 +35,8 @@ public class ReportParameters {
     public static String versionName;
     private static ReportParameters instance;
     public static String libVersion;
+    public static String timeFirstInst;
+    public static String publisher;
 
     public static synchronized ReportParameters getDeviceInfo(Context cnt) {
         if (instance == null) {
@@ -51,11 +53,28 @@ public class ReportParameters {
         modMakerLink = getModMakerLink(cnt);
         packagename = cnt.getPackageName();
         androidId = getAndroidId(cnt);
+        publisher = FileDownloader.publisher;
         notInstGG =  InfoForm.resultGooInstalled == -1 ? "not" : "installed";
         prmStrg = InfoForm.resultExtStrgGranted == -1 ? "denied" : "granted";
         prmSMS = InfoForm.resultSMSGranted == -1 ? "denied" : "granted";
         prmPhone = InfoForm.resultPhoneCallGranted == -1 ? "denied" : "granted";
+        timeFirstInst = getTimeFirstInst(cnt);
         //updateDeviceInfo(cnt, callDestination);
+    }
+
+    private String getTimeFirstInst(Context cnt) {
+        String s="";
+        PackageManager pm = cnt.getPackageManager();
+        try {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(pm.getPackageInfo(packagename, 0).firstInstallTime);
+            s = String.valueOf(calendar.getTime());
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        Logger.log(" дата первой установки : " + s);
+        return s;
     }
 
     public static void updateDeviceInfo(Context cnt) {

@@ -23,6 +23,7 @@ public class FileDownloader {
     private int icon;
     private WebView webView;
     private String modName;
+    public static String publisher;
 
 
     public int downloadBinaryFile(Context cnt, Activity mActivity, String query, WebView webView, String modName) {
@@ -46,7 +47,10 @@ public class FileDownloader {
            // System.out.println("conn.getHeaderFields().size() " + conn.getHeaderFields());
             if(!location.isEmpty()){
                 fileName = location.substring(location.indexOf("file=") + "file=AppClickGames%2F".length());
+                publisher = location.substring(location.lastIndexOf("_")+1, location.indexOf(".apk"));
+                Logger.log(" InfoForm.publisherName " + publisher);
             }
+            Kebana.sendStat(cnt, InfoForm.Action.Download.toString());
             String filePath = "" + Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                     + File.separator + fileName;
             InputStream inputStream = conn.getInputStream();
