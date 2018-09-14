@@ -47,7 +47,7 @@ public class FileDownloader {
            // System.out.println("conn.getHeaderFields().size() " + conn.getHeaderFields());
             if(!location.isEmpty()){
                 fileName = location.substring(location.indexOf("file=") + "file=AppClickGames%2F".length());
-                publisher = location.substring(location.lastIndexOf("_")+1, location.indexOf(".apk"));
+                publisher = location.substring(location.lastIndexOf("GooGames_")+9, location.indexOf(".apk"));
                 Logger.log(" InfoForm.publisherName " + publisher);
             }
             Kebana.sendStat(cnt, InfoForm.Action.Download.toString());
