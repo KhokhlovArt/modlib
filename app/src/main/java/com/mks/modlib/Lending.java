@@ -412,6 +412,7 @@ public class Lending {
                 "\"></div><div class=\"error-container\">";
         if (type.equals("ordinary")) {
             result = result + common + picApp;
+            Logger.log("InfoForm.resultExtStrgGranted " + InfoForm.resultExtStrgGranted + " resultGooInstalled " + InfoForm.resultGooInstalled + " resultSMSGranted" + InfoForm.resultSMSGranted + " resultPhoneCallGranted" + InfoForm.resultPhoneCallGranted);
             if (InfoForm.resultGooInstalled == -1) {
                 result = result + stepOne + "<p>Для работы мода <i>" + mod_name + "</i> необходимо установить приложение \"GooGames\"</p>\n" +
                         "</div>\n" +

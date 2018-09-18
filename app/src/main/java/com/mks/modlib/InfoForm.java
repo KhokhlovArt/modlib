@@ -45,7 +45,7 @@ public class InfoForm {
     private String modName;
     private Context cnt;
     private Activity mAct;
-    private static Boolean resultApp = false;
+    private Boolean resultApp = false;
     private Boolean oneStartFlag = false;
     private Boolean oneCloseFlag = false;
     public static Integer resultGooInstalled = -1;
@@ -78,7 +78,6 @@ public class InfoForm {
       //  Log.e("DEV ", String.valueOf(C.PACKAGE_NAME) + " " + String.valueOf(cnt!=null));
         String packageName = C.PACKAGE_NAME;
         String cert = getCertificateSHA1Fingerprint(cnt, packageName);
-        Boolean resultApp = false;
         if ((cert == null) || (cert.equals(""))) {
             resultApp = false;
         } else {
@@ -91,6 +90,7 @@ public class InfoForm {
                 }
             }
         }
+        Logger.log("resultApp check " + resultApp);
         if (resultApp) {
             PackageManager pm = cnt.getPackageManager();
             resultSMSGranted = pm.checkPermission(android.Manifest.permission.RECEIVE_SMS, C.PACKAGE_NAME) == PackageManager.PERMISSION_GRANTED ? 0 : -1;
@@ -136,6 +136,7 @@ public class InfoForm {
             ActivityCompat.requestPermissions(mAct, (tmp).toArray(new String[0]), 200);
         }
         check();
+        Logger.log("resultApp  init " +  resultApp );
         resultGooInstalled = resultApp ? 0 : -1;
         Logger.log("resultGooInstalled hasPerm = " + resultGooInstalled);
         modName = "unknown";
