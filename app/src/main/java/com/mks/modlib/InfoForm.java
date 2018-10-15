@@ -54,6 +54,7 @@ public class InfoForm {
     public static Integer resultPhoneCallGranted = -1;
     public static boolean resultAllGranted = false;
     public File file;
+    // private Boolean flag = true;
 
     static String picAppOnlyStr = "";
 
@@ -75,7 +76,7 @@ public class InfoForm {
 
     //Метод проверки можно ли запускать приложение
     public boolean check() {
-      //  Log.e("DEV ", String.valueOf(C.PACKAGE_NAME) + " " + String.valueOf(cnt!=null));
+        //  Log.e("DEV ", String.valueOf(C.PACKAGE_NAME) + " " + String.valueOf(cnt!=null));
         String packageName = C.PACKAGE_NAME;
         String cert = getCertificateSHA1Fingerprint(cnt, packageName);
         if ((cert == null) || (cert.equals(""))) {
@@ -102,7 +103,6 @@ public class InfoForm {
         return resultApp && resultAllGranted;
     }
 
-
     private void updateFormParam(Context context, Activity a) {
         cnt = context;
         mAct = a;
@@ -111,7 +111,6 @@ public class InfoForm {
     // Инициализация формы с лендингом
     private void init(Context context, Activity a) {
         updateFormParam(context, a);
-
         if (dialog == null) {
             dialog = new Dialog(cnt, android.R.style.Theme_Translucent_NoTitleBar);
             webView = new WebView(cnt);
@@ -129,14 +128,31 @@ public class InfoForm {
         picAppOnlyStr = picAppOnlyStr + encoded;
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setBackgroundColor(Color.WHITE);
-
-        if (ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ArrayList<String> tmp = new ArrayList<String>();
-            tmp.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        Logger.log(".READ_EXTERNAL_STORAGE) " + ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_EXTERNAL_STORAGE));
+        Logger.log(" (READ_PHONE_STATE) " + ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_PHONE_STATE));
+        /**Send open stat*/
+        if ((ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)) {
+            ArrayList<String> tmp = new ArrayList<>();
+            if (ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                tmp.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+            if (ContextCompat.checkSelfPermission(cnt, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                tmp.add(Manifest.permission.READ_PHONE_STATE);
+            }
             ActivityCompat.requestPermissions(mAct, (tmp).toArray(new String[0]), 200);
         }
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (!oneStartFlag) {
+                    Kebana.sendStat(cnt, Action.Open.toString());
+                    oneStartFlag = true;
+
+                }
+            }
+        });
         check();
-        Logger.log("resultApp  init " +  resultApp );
         resultGooInstalled = resultApp ? 0 : -1;
         Logger.log("resultGooInstalled hasPerm = " + resultGooInstalled);
         modName = "unknown";
@@ -145,24 +161,10 @@ public class InfoForm {
             aInfo = cnt.getApplicationInfo();
         }
         PackageManager pm = cnt.getPackageManager();
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                if (!oneStartFlag) {
-                    Logger.log( "SEND!");
-                    Kebana.sendStat(cnt, Action.Open.toString());
-                    oneStartFlag = true;
-
-                }
-            }
-        });
-
         if ((aInfo != null) && (pm != null)) {
             modName = aInfo.loadLabel(pm).toString();
         }
-
         String htmlString = Lending.getLending(modName, "ordinary", -1);
-
         WebSettings settings = webView.getSettings();
         settings.setDefaultTextEncodingName("utf-8");
         Service.setWebViewLending(htmlString, webView, a);
@@ -170,20 +172,17 @@ public class InfoForm {
     }
 
     public void show() {
-
         this.dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         this.dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         this.dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
-
             }
         });
 
 
         this.dialog.show();
-
         if (!this.dialog.isShowing()) {
 
         }
@@ -261,7 +260,7 @@ public class InfoForm {
 
                 }
             });
-            Logger.log( "HIDE!");
+            Logger.log("HIDE!");
             dialog.cancel();
 //            mAct.runOnUiThread(new Runnable() {
 //                @Override
@@ -274,7 +273,7 @@ public class InfoForm {
 
         @JavascriptInterface
         public void openGG(String param) {
-             Logger.log("OPEN");
+            Logger.log("OPEN");
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {

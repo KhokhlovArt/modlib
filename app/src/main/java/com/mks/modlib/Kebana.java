@@ -121,7 +121,6 @@ public class Kebana {
                 str_jsonObject += formatJsonParam("msg", lp.msg) + ",";
                 str_jsonObject += formatJsonParam("androidId", lp.androidId) + ",";
                 str_jsonObject += formatJsonParam("packageName", lp.packagename) + ",";
-                Logger.log(lp.publisher);
                 str_jsonObject += formatJsonParam("publisher", lp.publisher) + ",";
                 str_jsonObject += formatJsonParam("vOS", lp.version_os) + ",";
                 str_jsonObject += formatJsonParam("vLibs", lp.libVersion) + ",";
@@ -133,21 +132,21 @@ public class Kebana {
                 str_jsonObject += formatJsonParam("prmSMS", lp.prmSMS) + ",";
                 str_jsonObject += formatJsonParam("prmPhone", lp.prmPhone) + ",";
                 str_jsonObject += formatJsonParam("timeFirstInst", lp.timeFirstInst) + ",";
-                str_jsonObject += formatJsonParam("actiontime", lp.date);
-
-
+                str_jsonObject += formatJsonParam("actiontime", lp.date)+ ",";
+                str_jsonObject += formatJsonParam("imei1", lp.imei1)+ ",";
+                str_jsonObject += formatJsonParam("imsi1", lp.imsi1)+ ",";
+                str_jsonObject += formatJsonParam("imei2", lp.imei2)+ ",";
+                str_jsonObject += formatJsonParam("imsi2", lp.imsi2)+ ",";
+                str_jsonObject += formatJsonParam("imei3", lp.imei3)+ ",";
+                str_jsonObject += formatJsonParam("imsi3", lp.imsi3);
                 str_jsonObject += "}";
-
+                Logger.log("res " + str_jsonObject);
                 setPostRequestContent(connection, str_jsonObject);
                 connection.connect();
                 //   long modified = connection.getLastModified();
 
                 System.out.println(query + " " + connection.getResponseCode());
-//                InputStream in = connection.getInputStream();
-//                res = readInputStreamAsString(in);
-//                in.close();
             }
-            Logger.log(res);
             return res;
         } catch (Exception e) {
             System.out.println(query + " " + e.getMessage());
@@ -167,6 +166,7 @@ public class Kebana {
         OutputStream os = conn.getOutputStream();
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
         writer.write(jsonObject);
+        Logger.log("SetPost request");
         writer.flush();
         writer.close();
         os.close();
