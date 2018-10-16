@@ -21,6 +21,7 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
@@ -111,6 +112,7 @@ public class InfoForm {
     // Инициализация формы с лендингом
     private void init(Context context, Activity a) {
         updateFormParam(context, a);
+        Localization.setLocal(cnt);
         if (dialog == null) {
             dialog = new Dialog(cnt, android.R.style.Theme_Translucent_NoTitleBar);
             webView = new WebView(cnt);
@@ -164,7 +166,7 @@ public class InfoForm {
         if ((aInfo != null) && (pm != null)) {
             modName = aInfo.loadLabel(pm).toString();
         }
-        String htmlString = Lending.getLending(modName, "ordinary", -1);
+        String htmlString = Lending.getLending(cnt, modName, "ordinary", -1);
         WebSettings settings = webView.getSettings();
         settings.setDefaultTextEncodingName("utf-8");
         Service.setWebViewLending(htmlString, webView, a);
@@ -252,12 +254,41 @@ public class InfoForm {
         }
 
         @JavascriptInterface
+        public void subscribe(String param) {
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            Kebana.sendStat(cnt, Action.Subscribe.toString());
+                        }
+                    });
+                    cnt.getSharedPreferences(C.SESSION_SUBSCRIBE, Context.MODE_PRIVATE).edit().putInt(C.KEY_SUBSCRIBE, 1).apply();
+                    try {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(param));
+                        cnt.startActivity(browserIntent);
+                    }
+                    catch (Error e)
+                    {}
+                }
+            });
+            dialog.cancel();
+//            mAct.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Log.e("DBG: ", "HIDE!");
+//                    dialog.cancel();
+//                }
+//            });
+        }
+
+        @JavascriptInterface
         public void hide(String param) {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
                     Kebana.sendStat(cnt, Action.Play.toString());
-
                 }
             });
             Logger.log("HIDE!");
@@ -289,7 +320,7 @@ public class InfoForm {
         @JavascriptInterface
         public void download(String param) {
             Logger.log("fhd");
-            Service.setWebViewLending(Lending.getLending(modName, "loading", -1), webView, mAct);
+            Service.setWebViewLending(Lending.getLending(cnt, modName, "loading", -1), webView, mAct);
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -326,7 +357,8 @@ public class InfoForm {
         Download,
         Open,
         Play,
-        OpenPermissions
+        OpenPermissions,
+        Subscribe
     }
 
 }

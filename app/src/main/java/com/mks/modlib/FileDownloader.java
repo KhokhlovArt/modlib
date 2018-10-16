@@ -66,7 +66,7 @@ public class FileDownloader {
                 outputStream.write(buffer, 0, bytesRead);
                 if (tmp % 400 == 0) {
                    // System.out.println("tmp   " + tmp + " " + downloadSize);
-                    Service.setWebViewLending(Lending.getLending(modName, "loadingPercent",
+                    Service.setWebViewLending(Lending.getLending(cnt, modName, "loadingPercent",
                             (int) ((float) downloadSize / (float) lengthOfFile * 100)), webView, mActivity);
                 }
                 tmp++;
